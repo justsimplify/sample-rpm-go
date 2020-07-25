@@ -1,0 +1,50 @@
+buildscript {
+  repositories {
+    jcenter()
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+}
+
+plugins {
+  id "nebula.ospackage" version "8.4.1"
+}
+
+task copy(type: Copy) {
+  from "src"
+  into "${buildDir}/opt/samplegobuild"
+}
+
+project.tasks.buildRpm.dependsOn(copy)
+
+ospackage {
+  packageName = 'redisapi'
+  version =  '1.0.0'
+  release = '1'
+  arch=  X86_64
+  os = LINUX
+
+  preInstall file('pkg_scripts/preInstall.sh')
+  postInstall file('pkg_scripts/postInstall.sh')
+}
+
+buildRpm {
+  requires('jre')
+
+  from("etc/systemd/system") {
+    into '/etc/systemd/system'
+    fileMode 0644
+    user 'root'
+    permissionGroup 'root'
+  }
+
+  from("${buildDir}/opt/samplegobuild") {
+    into '/opt/samplegobuild'
+    fileMode 0644
+    user 'sample'
+    permissionGroup 'sample'
+  }
+}
+
+project.tasks.build.dependsOn(buildRpm)

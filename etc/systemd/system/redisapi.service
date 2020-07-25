@@ -1,0 +1,17 @@
+[Unit]
+Description=redisapi
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/environment
+ExecStart=/bin/bash /opt/samplegobuild/entrypoint.sh > /var/log/sampleapp/sampleapp.log 2>&1
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=30s
+User=sample
+Group=sample
+KillSignal=SIGINT
+WorkingDirectory=/opt/samplegobuild
+
+[Install]
+WantedBy=multi-user.target
